@@ -186,7 +186,7 @@ label {
     color: var(--text-muted);
 }
 
-input, select, textarea {
+/* input, select, textarea {
     width: 100%;
     padding: 12px 16px;
     background: rgba(0, 0, 0, 0.2);
@@ -195,13 +195,39 @@ input, select, textarea {
     color: var(--text-color);
     font-size: 1rem;
     transition: var(--transition-fast);
+} */
+
+input, select, textarea {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.92); /* FIX: light background */
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-md);
+    color: #051d16;                        /* FIX: dark text */
+    font-size: 1rem;
+    line-height: 1.4;                      /* FIX: prevent clipping */
+    transition: var(--transition-fast);
 }
+
+input::placeholder,
+textarea::placeholder {
+    color: #6b7280;   /* clearly visible placeholder */
+    opacity: 1;
+}
+
+/* input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    background: rgba(0, 0, 0, 0.3);
+} */
 
 input:focus, select:focus, textarea:focus {
     outline: none;
     border-color: var(--accent-color);
-    background: rgba(0, 0, 0, 0.3);
+    background: #ffffff;
+    box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.25);
 }
+
 
 .form-actions {
     margin-top: 30px;
