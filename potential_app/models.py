@@ -131,9 +131,15 @@ class LandAnalysis(models.Model):
         blank=True,
         related_name='analyses'
     )
+    latitude = models.DecimalField(
+    max_digits=9,
+    decimal_places=6
+    )
+    longitude = models.DecimalField(
+    max_digits=9,
+    decimal_places=6
+    )
 
-    latitude = models.DecimalField()
-    longitude = models.DecimalField()
     area_m2 = models.FloatField(null=True, blank=True)
     area_ha = models.FloatField(null=True, blank=True)
 
