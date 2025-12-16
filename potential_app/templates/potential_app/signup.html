@@ -1,0 +1,221 @@
+{% extends 'potential_app/base.html' %}
+
+{# ✅ Hide Login / Sign Up buttons in navbar for this page #}
+{% block auth_buttons %}{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary: #27ae60;
+        --secondary: #2ecc71;
+        --accent: #16a085;
+        --dark-green: #2c3e50;
+        --glass-bg: rgba(255, 255, 255, 0.92);
+        --glass-border: rgba(255, 255, 255, 0.3);
+        --text-dark: #2c3e50;
+        --text-muted: #5a6c7d;
+        --error: #e74c3c;
+    }
+
+    /* ===== BACKGROUND ===== */
+    body {
+        margin: 0;
+        min-height: 100vh;
+        background: linear-gradient(
+            -45deg,
+            #56ab2f,
+            #27ae60,
+            #2ecc71,
+            #16a085
+        );
+        background-size: 400% 400%;
+        animation: gradientMove 14s ease infinite;
+        font-family: "Segoe UI", system-ui, sans-serif;
+    }
+
+    @keyframes gradientMove {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    /* ===== LAYOUT ===== */
+    .auth-wrapper {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    /* ===== CARD ===== */
+    .auth-card {
+        width: 100%;
+        max-width: 480px;
+        background: var(--glass-bg);
+        backdrop-filter: blur(18px);
+        border-radius: 22px;
+        border: 1px solid var(--glass-border);
+        box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+        padding: 40px 36px;
+        animation: fadeUp 0.6s ease;
+    }
+
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(25px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== HEADER ===== */
+    .auth-header {
+        text-align: center;
+        margin-bottom: 26px;
+    }
+
+    .auth-header h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .auth-header p {
+        font-size: 0.95rem;
+        color: var(--text-muted);
+    }
+
+    /* ===== FORM ===== */
+    .form-group {
+        margin-bottom: 18px;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: var(--dark-green);
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 14px;
+        border-radius: 10px;
+        border: 1px solid rgba(39,174,96,0.25);
+        font-size: 0.95rem;
+        background: #fff;
+    }
+
+    .form-group input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(39,174,96,0.2);
+    }
+
+    small {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+    }
+
+    /* ===== ERROR BOX ===== */
+    .error-box {
+        background: rgba(231,76,60,0.12);
+        border: 1px solid rgba(231,76,60,0.3);
+        color: var(--error);
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 18px;
+        font-size: 0.9rem;
+    }
+
+    /* ===== BUTTON ===== */
+    .btn-primary {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, var(--primary), var(--accent));
+        border: none;
+        border-radius: 10px;
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .btn-primary:hover {
+        opacity: 0.95;
+        box-shadow: 0 10px 25px rgba(39,174,96,0.45);
+    }
+
+    /* ===== FOOTER LINKS ===== */
+    .auth-footer {
+        margin-top: 24px;
+        text-align: center;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+    }
+
+    .auth-footer a {
+        color: var(--primary);
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .auth-footer a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<div class="auth-wrapper">
+    <div class="auth-card">
+
+        <div class="auth-header">
+            <h2>Create Account</h2>
+            <p>Register as a landowner to unlock land potential insights</p>
+        </div>
+
+        <form method="post" action="{% url 'signup' %}">
+            {% csrf_token %}
+
+            {% if form.errors %}
+            <div class="error-box">
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <p>{{ field.label }}: {{ error }}</p>
+                    {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% for field in form %}
+            <div class="form-group">
+                <label>{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                    <small>{{ field.help_text }}</small>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="btn-primary">
+                Create Account (Landowner)
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            <p>
+                Are you a Solar Builder?
+                <a href="{% url 'builder_signup' %}">Register here</a>
+            </p>
+            <p class="mt-2">
+                Already have an account?
+                <a href="{% url 'login' %}">Login here</a>
+            </p>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

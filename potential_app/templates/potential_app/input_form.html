@@ -1,0 +1,872 @@
+{% extends 'potential_app/base.html' %}
+
+{% block content %}
+<style>
+  :root {
+    --primary: #1f7a4c;
+    --accent: #2aa864;
+    --muted: #6b7785;
+    --panel-bg: rgba(255, 255, 255, 0.95);
+    --outline: rgba(36, 60, 50, 0.08);
+    --shadow: 0 12px 40px rgba(16, 40, 30, 0.12);
+    --glass-bg: rgba(255, 255, 255, 0.88);
+  }
+
+  /* Page & shell */
+  html,
+  body {
+    height: 100%;
+    margin: 0;
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+    background-attachment: fixed;
+    color: #23323a;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Main container with glass effect */
+  .container-full {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    height: calc(100vh - 3rem);
+    box-sizing: border-box;
+    backdrop-filter: blur(10px);
+  }
+
+  /* Left form panel - Enhanced glass effect */
+  .left-panel {
+    flex: 0 0 42%;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+  }
+
+  .left-panel:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 50px rgba(16, 40, 30, 0.18);
+  }
+
+  /* Enhanced header with gradient */
+  .left-header {
+    background: linear-gradient(135deg, rgba(31, 122, 76, 0.95), rgba(42, 168, 100, 0.95));
+    color: #fff;
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .left-header h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .left-header .muted {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    color: rgba(255, 255, 255, 0.9);
+    margin-top: 0.25rem;
+  }
+
+  /* Form body with better spacing */
+  .form-body {
+    padding: 2rem;
+    overflow: auto;
+    flex: 1;
+  }
+
+  /* Enhanced section titles */
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--primary);
+    font-weight: 600;
+    margin-bottom: 1.25rem;
+    font-size: 1.1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid rgba(31, 122, 76, 0.1);
+    position: relative;
+  }
+
+  .section-title::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 40px;
+    height: 2px;
+    background: var(--primary);
+    border-radius: 2px;
+  }
+
+  .section-title i {
+    color: var(--primary);
+    font-size: 1.1rem;
+  }
+
+  /* Improved compact grid */
+  .row-compact {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+  }
+
+  .col-half {
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* Enhanced form controls */
+  .form-control,
+  .form-select {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    font-size: 0.95rem;
+    border-radius: 12px;
+    border: 2px solid rgba(36, 60, 50, 0.1);
+    background: rgba(255, 255, 255, 0.9);
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  }
+
+  .form-control:focus,
+  .form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(31, 122, 76, 0.15);
+    background: rgba(255, 255, 255, 0.95);
+    transform: translateY(-1px);
+  }
+
+  .form-label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .label-muted {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-top: 0.5rem;
+  }
+
+  /* Enhanced advanced toggle */
+  .advanced-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 1.5rem 0 1rem 0;
+    padding: 1rem 0;
+    border-top: 1px solid rgba(36, 60, 50, 0.06);
+    border-bottom: 1px solid rgba(36, 60, 50, 0.06);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    border: 2px solid rgba(36, 60, 50, 0.1);
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--primary);
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .btn-ghost:hover {
+    background: rgba(31, 122, 76, 0.05);
+    border-color: var(--primary);
+    transform: translateY(-1px);
+  }
+
+  /* Enhanced action buttons */
+  .action-row {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(36, 60, 50, 0.06);
+  }
+
+  .btn-primary-strong {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: #fff;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    box-shadow: 0 8px 25px rgba(39, 174, 96, 0.25);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-primary-strong::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+  }
+
+  .btn-primary-strong:hover::before {
+    left: 100%;
+  }
+
+  .btn-primary-strong:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(39, 174, 96, 0.4);
+  }
+
+  .btn-reset {
+    background: rgba(255, 255, 255, 0.8);
+    border: 2px solid rgba(36, 60, 50, 0.1);
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 500;
+    color: var(--muted);
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .btn-reset:hover {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: var(--muted);
+    transform: translateY(-1px);
+  }
+
+  /* Enhanced summary box */
+  .summary-box {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    border-radius: 16px;
+    background: rgba(251, 253, 252, 0.8);
+    border: 2px solid rgba(36, 60, 50, 0.06);
+    font-size: 0.95rem;
+    color: var(--muted);
+    backdrop-filter: blur(10px);
+  }
+
+  .summary-box strong {
+    color: var(--primary);
+    font-size: 1rem;
+  }
+
+  /* Right panel - Enhanced glass effect */
+  .right-panel {
+    flex: 1;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+  }
+
+  .right-panel:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 50px rgba(16, 40, 30, 0.18);
+  }
+
+  /* Map styling */
+  #map {
+    width: 100%;
+    height: 100%;
+    min-height: 500px;
+    border-radius: 20px;
+  }
+
+  /* Enhanced map overlay */
+  .map-overlay {
+    position: absolute;
+    top: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 4500;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(15px);
+    padding: 1rem 1.5rem;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+  }
+
+  .coord-badge {
+    font-size: 0.9rem;
+    color: #1f3b2f;
+    background: rgba(249, 253, 249, 0.9);
+    border-radius: 10px;
+    padding: 0.5rem 1rem;
+    border: 1px solid rgba(36, 60, 50, 0.08);
+    font-weight: 500;
+    min-width: 120px;
+    text-align: center;
+  }
+
+  #geocodeSearch {
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    border: 2px solid rgba(36, 60, 50, 0.1);
+    width: 320px;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+    background: rgba(255, 255, 255, 0.9);
+    transition: all 0.3s ease;
+  }
+
+  #geocodeSearch:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(31, 122, 76, 0.15);
+    background: rgba(255, 255, 255, 0.95);
+  }
+
+  /* Enhanced locate button */
+  .locate-btn {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border: none;
+    color: white;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 20px rgba(39, 174, 96, 0.35);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.1rem;
+  }
+
+  .locate-btn:hover {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 8px 25px rgba(39, 174, 96, 0.5);
+  }
+
+  /* Advanced settings card enhancement */
+  .advanced-card {
+    padding: 1.5rem;
+    border-radius: 16px;
+    background: rgba(251, 253, 252, 0.8);
+    border: 2px solid rgba(36, 60, 50, 0.06);
+    backdrop-filter: blur(10px);
+  }
+
+  .advanced-card>div {
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--primary);
+    font-size: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(36, 60, 50, 0.1);
+  }
+
+  /* Animation for form sections */
+  .section {
+    animation: fadeInUp 0.6s ease forwards;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .section:nth-child(1) {
+    animation-delay: 0.1s;
+  }
+
+  .section:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+
+  .section:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+
+  .section:nth-child(4) {
+    animation-delay: 0.4s;
+  }
+
+  @keyframes fadeInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 1200px) {
+    .container-full {
+      flex-direction: column;
+      height: auto;
+      padding: 1rem;
+    }
+
+    .left-panel {
+      flex: none;
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+
+    .right-panel {
+      width: 100%;
+      height: 60vh;
+      min-height: 500px;
+    }
+
+    .map-overlay {
+      left: 50%;
+      transform: translateX(-50%);
+      top: 1rem;
+      width: 90%;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    #geocodeSearch {
+      width: 100%;
+      max-width: 400px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .form-body {
+      padding: 1.5rem;
+    }
+
+    .row-compact {
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .col-half {
+      width: 100%;
+    }
+
+    .action-row {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .map-overlay {
+      padding: 0.75rem 1rem;
+    }
+
+    .coord-badge {
+      min-width: 100px;
+      font-size: 0.85rem;
+      padding: 0.4rem 0.75rem;
+    }
+  }
+
+  /* Custom scrollbar for form body */
+  .form-body::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .form-body::-webkit-scrollbar-track {
+    background: rgba(36, 60, 50, 0.05);
+    border-radius: 3px;
+  }
+
+  .form-body::-webkit-scrollbar-thumb {
+    background: rgba(31, 122, 76, 0.3);
+    border-radius: 3px;
+  }
+
+  .form-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(31, 122, 76, 0.5);
+  }
+</style>
+
+<div class="container-full">
+  <!-- LEFT PANEL: FORM -->
+  <div class="left-panel">
+    <div class="left-header">
+      <div>
+        <h2><i class="fas fa-map-marked-alt"></i> Land Potential Analysis</h2>
+        <div class="muted">Professional renewable energy potential assessment</div>
+      </div>
+      <div><small class="muted">v2.0</small></div>
+    </div>
+
+    <div class="form-body">
+      <form method="post">
+        {% csrf_token %}
+
+        <div class="section">
+          <div class="section-title"><i class="fas fa-location-arrow"></i> Location & Area</div>
+
+          <div class="row-compact">
+            <div class="col-half">
+              <label class="form-label">Latitude</label>
+              {{ form.latitude }}
+              <div class="label-muted">Between -90° and 90°</div>
+            </div>
+            <div class="col-half">
+              <label class="form-label">Longitude</label>
+              {{ form.longitude }}
+              <div class="label-muted">Between -180° and 180°</div>
+            </div>
+          </div>
+
+          <div class="row-compact">
+            <div class="col-half">
+              <label class="form-label">Area (m²)</label>
+              {{ form.area_m2 }}
+              <div class="label-muted">Square meters</div>
+            </div>
+            <div class="col-half">
+              <label class="form-label">Area (hectares)</label>
+              {{ form.area_ha }}
+              <div class="label-muted">1 hectare = 10,000 m²</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title"><i class="fas fa-calendar-alt"></i> Time Period</div>
+          <div class="row-compact">
+            <div class="col-half">
+              <label class="form-label">Start Date</label>
+              {{ form.start_date }}
+            </div>
+            <div class="col-half">
+              <label class="form-label">End Date</label>
+              {{ form.end_date }}
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="advanced-toggle">
+            <div class="section-title"><i class="fas fa-cogs"></i> Advanced Settings</div>
+            <button class="btn-ghost" type="button" data-bs-toggle="collapse" data-bs-target="#advancedSettings">
+              <i class="fas fa-sliders-h me-1"></i> Configure
+            </button>
+          </div>
+
+          <div class="collapse" id="advancedSettings">
+            <div class="advanced-card">
+              <div>Photovoltaic (PV) Settings</div>
+              <div class="row-compact" style="flex-wrap:wrap;">
+                {% for field in advanced_form %}
+                {% if 'pv' in field.name %}
+                <div style="flex:1 1 48%; min-width:0; margin-bottom:1rem;">
+                  <label class="form-label small">{{ field.label }}</label>
+                  {{ field }}
+                  {% if field.help_text %}<div class="label-muted">{{ field.help_text }}</div>{% endif %}
+                </div>
+                {% endif %}
+                {% endfor %}
+              </div>
+
+              <div>Wind Turbine Settings</div>
+              <div class="row-compact" style="flex-wrap:wrap;">
+                {% for field in advanced_form %}
+                {% if 'wind' in field.name %}
+                <div style="flex:1 1 48%; min-width:0; margin-bottom:1rem;">
+                  <label class="form-label small">{{ field.label }}</label>
+                  {{ field }}
+                  {% if field.help_text %}<div class="label-muted">{{ field.help_text }}</div>{% endif %}
+                </div>
+                {% endif %}
+                {% endfor %}
+              </div>
+
+              <div>Direct Current (DC) Settings</div>
+              <div class="row-compact" style="flex-wrap:wrap;">
+                {% for field in advanced_form %}
+                {% if 'dc' in field.name %}
+                <div style="flex:1 1 48%; min-width:0; margin-bottom:1rem;">
+                  <label class="form-label small">{{ field.label }}</label>
+                  {{ field }}
+                  {% if field.help_text %}<div class="label-muted">{{ field.help_text }}</div>{% endif %}
+                </div>
+                {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="action-row">
+            <button type="submit" class="btn-primary-strong">
+              <i class="fas fa-calculator me-2"></i> Analyze Potential
+            </button>
+            <button type="button" id="resetMap" class="btn-reset">
+              <i class="fas fa-refresh me-2"></i> Reset Map
+            </button>
+            <div style="flex:1"></div>
+          </div>
+
+          <div class="summary-box">
+            <strong>Quick Summary</strong>
+            <div class="label-muted" style="margin-top:0.75rem;">
+              Coordinates and area will update automatically when you interact with the map.
+              Draw boundaries to calculate precise land area measurements.
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL: MAP -->
+  <div class="right-panel">
+    <div class="map-overlay" id="mapOverlay">
+      <div class="coord-badge">Lat: <span id="latVal">--</span></div>
+      <div class="coord-badge">Lng: <span id="lngVal">--</span></div>
+      <input id="geocodeSearch" placeholder="Search location (city, address, coordinates)" />
+      <button id="locateBtn" class="locate-btn" title="Use my current location">
+        <i class="fas fa-location-crosshairs"></i>
+      </button>
+    </div>
+
+    <div id="map"></div>
+  </div>
+</div>
+
+<!-- Leaflet & plugins -->
+<!-- Leaflet Core is in base.html -->
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet-draw/dist/leaflet.draw.css" />
+<script src="https://unpkg.com/leaflet-draw/dist/leaflet.draw.js"></script>
+
+<script src="https://unpkg.com/leaflet-geometryutil"></script>
+
+<!-- Geocoder (Nominatim control) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Map default center (India)
+    var defaultCenter = [20.5937, 78.9629];
+    var map = L.map('map', { zoomControl: true }).setView(defaultCenter, 5);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Allow user to click anywhere to place marker
+    map.on('click', function (e) {
+      placeMarker(e.latlng);
+    });
+
+    // Geocoder (Nominatim)
+    var geocoder = L.Control.Geocoder.nominatim();
+    var searchInput = document.getElementById('geocodeSearch');
+    var searchTimeout = null;
+    searchInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') e.preventDefault();
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(function () {
+        var q = searchInput.value.trim();
+        if (!q) return;
+        geocoder.geocode(q, function (results) {
+          if (!results || results.length === 0) return;
+          var r = results[0];
+          map.setView(r.center, Math.max(map.getZoom(), 12));
+          placeMarker(r.center);
+        });
+      }, 250);
+    });
+
+    // locate button (uses browser geolocation)
+    var locateBtn = document.getElementById('locateBtn');
+    locateBtn.addEventListener('click', function () {
+      if (!navigator.geolocation) {
+        alert('Geolocation is not supported by your browser.');
+        return;
+      }
+
+      // show spinner
+      locateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+      navigator.geolocation.getCurrentPosition(function (pos) {
+        var lat = pos.coords.latitude;
+        var lng = pos.coords.longitude;
+        map.setView([lat, lng], 14);
+        placeMarker([lat, lng]);
+        locateBtn.innerHTML = '<i class="fas fa-location-crosshairs"></i>';
+      }, function (err) {
+        // error callback
+        console.error('Geolocation error:', err);
+        alert('Unable to fetch your current location.');
+        locateBtn.innerHTML = '<i class="fas fa-location-crosshairs"></i>';
+      }, {
+        enableHighAccuracy: true,
+        timeout: 10000
+      });
+    });
+
+    // Marker and drawn items
+    var marker = null;
+    var drawnItems = new L.FeatureGroup();
+    map.addLayer(drawnItems);
+
+    function placeMarker(latlng) {
+      if (!latlng) return;
+      // accept either [lat,lng] array or LatLng object
+      var ll = Array.isArray(latlng) ? L.latLng(latlng[0], latlng[1]) : latlng;
+      if (marker) {
+        marker.setLatLng(ll);
+      } else {
+        marker = L.marker(ll, {
+          draggable: true,
+          icon: L.divIcon({
+            className: 'custom-pulse-marker',
+            html: '<div style="background: #1f7a4c; width: 24px; height: 24px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 10px rgba(0,0,0,0.3); animation: pulse 2s infinite;"></div>',
+            iconSize: [24, 24],
+            iconAnchor: [12, 12]
+          })
+        }).addTo(map);
+        marker.on('dragend', function (ev) {
+          var p = ev.target.getLatLng();
+          setCoordinateFields(p.lat, p.lng);
+        });
+      }
+      setCoordinateFields(ll.lat, ll.lng);
+    }
+
+    function setCoordinateFields(lat, lng) {
+      var latF = document.getElementById('id_latitude');
+      var lngF = document.getElementById('id_longitude');
+      if (latF) latF.value = parseFloat(lat).toFixed(6);
+      if (lngF) lngF.value = parseFloat(lng).toFixed(6);
+      document.getElementById('latVal').textContent = parseFloat(lat).toFixed(6);
+      document.getElementById('lngVal').textContent = parseFloat(lng).toFixed(6);
+    }
+
+    // Draw control
+    var drawControl = new L.Control.Draw({
+      edit: { featureGroup: drawnItems },
+      draw: {
+        polygon: {
+          allowIntersection: false,
+          showArea: true,
+          shapeOptions: {
+            color: '#1f7a4c',
+            fillColor: '#1f7a4c',
+            fillOpacity: 0.2
+          }
+        },
+        rectangle: {
+          shapeOptions: {
+            color: '#1f7a4c',
+            fillColor: '#1f7a4c',
+            fillOpacity: 0.2
+          }
+        },
+        circle: false,
+        marker: false,
+        polyline: false
+      }
+    });
+    map.addControl(drawControl);
+
+    map.on(L.Draw.Event.CREATED, function (e) {
+      drawnItems.clearLayers();
+      var layer = e.layer;
+      drawnItems.addLayer(layer);
+
+      var latlngs = null;
+      if (layer.getLatLngs) {
+        latlngs = layer.getLatLngs();
+        if (Array.isArray(latlngs) && Array.isArray(latlngs[0])) latlngs = latlngs[0];
+      }
+
+      if (latlngs && latlngs.length > 2) {
+        var area = L.GeometryUtil.geodesicArea(latlngs);
+        var areaHa = (area / 10000).toFixed(2);
+        var areaM2 = area.toFixed(2);
+        var areaM2Field = document.getElementById('id_area_m2');
+        var areaHaField = document.getElementById('id_area_ha');
+        if (areaM2Field) areaM2Field.value = areaM2;
+        if (areaHaField) areaHaField.value = areaHa;
+
+        // centroid calculation
+        var sumLat = 0, sumLng = 0;
+        latlngs.forEach(function (p) { sumLat += p.lat; sumLng += p.lng; });
+        var centroid = { lat: sumLat / latlngs.length, lng: sumLng / latlngs.length };
+        placeMarker([centroid.lat, centroid.lng]);
+      }
+    });
+
+    // click on map places marker
+    map.on('click', function (e) {
+      placeMarker(e.latlng);
+    });
+
+    // reset map button
+    document.getElementById('resetMap').addEventListener('click', function () {
+      drawnItems.clearLayers();
+      if (marker) { map.removeLayer(marker); marker = null; }
+      var areaM2Field = document.getElementById('id_area_m2');
+      var areaHaField = document.getElementById('id_area_ha');
+      var latF = document.getElementById('id_latitude');
+      var lngF = document.getElementById('id_longitude');
+      if (areaM2Field) areaM2Field.value = '';
+      if (areaHaField) areaHaField.value = '';
+      if (latF) latF.value = '';
+      if (lngF) lngF.value = '';
+      document.getElementById('latVal').textContent = '--';
+      document.getElementById('lngVal').textContent = '--';
+      map.setView(defaultCenter, 5);
+    });
+
+    // pre-fill if form has values (e.g., editing)
+    try {
+      var latFld = document.getElementById('id_latitude');
+      var lngFld = document.getElementById('id_longitude');
+      var latVal = parseFloat(latFld && latFld.value ? latFld.value : '');
+      var lngVal = parseFloat(lngFld && lngFld.value ? lngFld.value : '');
+      if (!isNaN(latVal) && !isNaN(lngVal)) {
+        placeMarker([latVal, lngVal]);
+        map.setView([latVal, lngVal], 13);
+      }
+    } catch (err) { /* ignore */ }
+
+    // ensure map renders correctly after load / resize
+    setTimeout(function () { map.invalidateSize(); }, 300);
+    window.addEventListener('resize', function () { map.invalidateSize(); });
+  });
+
+  // Add pulse animation for marker
+  const style = document.createElement('style');
+  style.textContent = `
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 1; }
+}
+`;
+  document.head.appendChild(style);
+</script>
+{% endblock %}

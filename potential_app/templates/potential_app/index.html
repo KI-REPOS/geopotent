@@ -1,0 +1,1115 @@
+{% extends 'potential_app/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    :root {
+        --agri-green: #2E7D32;
+        --agri-light-green: #4CAF50;
+        --agri-gold: #FF9800;
+        --agri-earth: #795548;
+        --agri-sky: #2196F3;
+        --agri-cream: #F5F5DC;
+        --agri-dark: #1B5E20;
+        --agri-gradient: linear-gradient(135deg, #2E7D32, #1B5E20, #4CAF50);
+    }
+
+    /* Hero Section with Advanced Effects */
+    .hero-section {
+        position: relative;
+        height: 100vh;
+        min-height: 800px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        background: 
+            radial-gradient(ellipse at 20% 50%, rgba(46, 125, 50, 0.15) 0%, transparent 50%),
+            radial-gradient(ellipse at 80% 20%, rgba(255, 152, 0, 0.1) 0%, transparent 50%),
+            linear-gradient(rgba(15, 15, 15, 0.9), rgba(15, 15, 15, 0.95)),
+            url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+        background-size: cover, cover, cover, cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
+
+    .hero-background-particles {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .particle {
+        position: absolute;
+        background: radial-gradient(circle, var(--agri-light-green), transparent);
+        border-radius: 50%;
+        opacity: 0;
+        animation: floatParticle 15s infinite linear;
+    }
+
+    @keyframes floatParticle {
+        0% {
+            transform: translateY(100vh) rotate(0deg);
+            opacity: 0;
+        }
+        10% {
+            opacity: 0.3;
+        }
+        90% {
+            opacity: 0.3;
+        }
+        100% {
+            transform: translateY(-100px) rotate(360deg);
+            opacity: 0;
+        }
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 3;
+        max-width: 1200px;
+        width: 90%;
+        padding: 60px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 30px;
+        box-shadow: 
+            0 25px 50px rgba(0, 0, 0, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1),
+            0 0 0 1px rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transform-style: preserve-3d;
+        perspective: 1000px;
+    }
+
+    .main-title {
+        font-size: 4.5rem;
+        font-weight: 900;
+        margin-bottom: 30px;
+        background: linear-gradient(135deg, #ffffff 0%, #4CAF50 50%, #FF9800 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        line-height: 1.1;
+        text-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        animation: titleGlow 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes titleGlow {
+        0% {
+            filter: drop-shadow(0 5px 15px rgba(76, 175, 80, 0.3));
+        }
+        100% {
+            filter: drop-shadow(0 5px 25px rgba(76, 175, 80, 0.6));
+        }
+    }
+
+    .title-highlight {
+        position: relative;
+        display: inline-block;
+    }
+
+    .title-highlight::after {
+        content: '';
+        position: absolute;
+        bottom: 5px;
+        left: 0;
+        width: 100%;
+        height: 12px;
+        background: linear-gradient(90deg, transparent, var(--agri-gold), transparent);
+        z-index: -1;
+        border-radius: 6px;
+        opacity: 0.5;
+        animation: highlightPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes highlightPulse {
+        0%, 100% {
+            opacity: 0.3;
+            transform: scaleX(0.95);
+        }
+        50% {
+            opacity: 0.7;
+            transform: scaleX(1.05);
+        }
+    }
+
+    .hero-subtitle {
+        font-size: 1.5rem;
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 50px;
+        line-height: 1.7;
+        max-width: 800px;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .cta-buttons {
+        display: flex;
+        gap: 25px;
+        flex-wrap: wrap;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--agri-green), var(--agri-dark));
+        border: none;
+        padding: 22px 50px;
+        border-radius: 50px;
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: white;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 
+            0 10px 30px rgba(46, 125, 50, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        position: relative;
+        overflow: hidden;
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        transform: translateY(0);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-8px) scale(1.05);
+        box-shadow: 
+            0 20px 40px rgba(46, 125, 50, 0.6),
+            inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        background: linear-gradient(135deg, var(--agri-light-green), var(--agri-green));
+    }
+
+    .btn-primary::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+        transition: 0.6s;
+    }
+
+    .btn-primary:hover::before {
+        left: 100%;
+    }
+
+    .btn-primary::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 50px;
+        padding: 2px;
+        background: linear-gradient(135deg, var(--agri-gold), transparent);
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        opacity: 0;
+        transition: opacity 0.4s;
+    }
+
+    .btn-primary:hover::after {
+        opacity: 1;
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        padding: 22px 50px;
+        border-radius: 50px;
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: white;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        overflow: hidden;
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        backdrop-filter: blur(10px);
+    }
+
+    .btn-outline:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: var(--agri-gold);
+        color: var(--agri-gold);
+        transform: translateY(-8px);
+        box-shadow: 0 15px 35px rgba(255, 152, 0, 0.3);
+    }
+
+    /* Features Section */
+    .features-section {
+        padding: 150px 20px;
+        background: linear-gradient(180deg, #0a1f0a 0%, #142814 100%);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .features-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: 
+            radial-gradient(circle at 10% 20%, rgba(76, 175, 80, 0.05) 0%, transparent 20%),
+            radial-gradient(circle at 90% 80%, rgba(255, 152, 0, 0.05) 0%, transparent 20%);
+        animation: rotateBackground 60s linear infinite;
+    }
+
+    @keyframes rotateBackground {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 100px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .section-title {
+        font-size: 3.5rem;
+        font-weight: 900;
+        color: white;
+        margin-bottom: 25px;
+        position: relative;
+        display: inline-block;
+        text-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: -15px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 200px;
+        height: 4px;
+        background: linear-gradient(to right, transparent, var(--agri-gold), var(--agri-light-green), transparent);
+        border-radius: 2px;
+    }
+
+    .section-subtitle {
+        font-size: 1.3rem;
+        color: rgba(255, 255, 255, 0.8);
+        max-width: 700px;
+        margin: 0 auto;
+        opacity: 0.9;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 50px;
+        max-width: 1300px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 2;
+    }
+
+    .feature-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 25px;
+        overflow: hidden;
+        box-shadow: 
+            0 15px 35px rgba(0, 0, 0, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        height: 100%;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .feature-card:hover {
+        transform: translateY(-20px) scale(1.02);
+        box-shadow: 
+            0 30px 60px rgba(46, 125, 50, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        border-color: rgba(76, 175, 80, 0.3);
+    }
+
+    .feature-image {
+        height: 250px;
+        width: 100%;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .feature-image::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to top, rgba(10, 31, 10, 0.9) 0%, transparent 100%);
+    }
+
+    .feature-content {
+        padding: 40px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .feature-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, var(--agri-light-green), var(--agri-green));
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2rem;
+        margin-bottom: 30px;
+        box-shadow: 0 15px 30px rgba(76, 175, 80, 0.4);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .feature-icon::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+        transition: 0.5s;
+    }
+
+    .feature-card:hover .feature-icon {
+        transform: rotate(20deg) scale(1.1);
+        background: linear-gradient(135deg, var(--agri-gold), var(--agri-light-green));
+    }
+
+    .feature-card:hover .feature-icon::before {
+        left: 100%;
+    }
+
+    .feature-card h3 {
+        color: white;
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+        font-weight: 700;
+        text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    }
+
+    .feature-card p {
+        color: rgba(255, 255, 255, 0.8);
+        line-height: 1.7;
+        margin-bottom: 25px;
+    }
+
+    .feature-highlight {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 20px;
+        background: linear-gradient(135deg, rgba(76, 175, 80, 0.2), rgba(46, 125, 50, 0.2));
+        border-radius: 50px;
+        font-size: 1rem;
+        color: var(--agri-light-green);
+        font-weight: 500;
+        border: 1px solid rgba(76, 175, 80, 0.3);
+        backdrop-filter: blur(10px);
+    }
+
+    /* Stats Section - Redesigned */
+    .stats-section {
+        padding: 150px 20px;
+        background: linear-gradient(135deg, #0c2912 0%, #1a4721 100%);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stats-container {
+        max-width: 1300px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 40px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .stat-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 20px;
+        padding: 40px 30px;
+        text-align: center;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, transparent 30%, rgba(255, 152, 0, 0.1) 100%);
+        opacity: 0;
+        transition: opacity 0.4s;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-15px);
+        background: rgba(255, 255, 255, 0.1);
+        border-color: var(--agri-gold);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .stat-card:hover::before {
+        opacity: 1;
+    }
+
+    .stat-number {
+        font-size: 4rem;
+        font-weight: 900;
+        color: var(--agri-gold);
+        margin-bottom: 15px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        text-shadow: 0 5px 15px rgba(255, 152, 0, 0.3);
+        position: relative;
+        display: inline-block;
+    }
+
+    .stat-number::after {
+        content: '';
+        position: absolute;
+        bottom: -5px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60%;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, var(--agri-gold), transparent);
+        border-radius: 2px;
+    }
+
+    .stat-label {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: white;
+        opacity: 0.9;
+        text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    }
+
+    .stat-subtext {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.7);
+        margin-top: 10px;
+        display: block;
+    }
+
+    /* Value Prop Section */
+    .value-section {
+        padding: 150px 20px;
+        background: linear-gradient(180deg, #142814 0%, #0a1f0a 100%);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .value-container {
+        max-width: 1300px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 60px;
+        align-items: center;
+        position: relative;
+        z-index: 2;
+    }
+
+    .value-image {
+        border-radius: 25px;
+        overflow: hidden;
+        box-shadow: 
+            0 30px 60px rgba(0, 0, 0, 0.4),
+            0 0 0 1px rgba(255, 255, 255, 0.1);
+        height: 600px;
+        background: url('https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80');
+        background-size: cover;
+        background-position: center;
+        position: relative;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .value-image:hover {
+        transform: scale(1.02) rotate(1deg);
+        box-shadow: 
+            0 40px 80px rgba(46, 125, 50, 0.4),
+            0 0 0 1px rgba(76, 175, 80, 0.3);
+    }
+
+    .value-content {
+        padding: 40px;
+    }
+
+    .value-content h2 {
+        font-size: 3.2rem;
+        color: white;
+        margin-bottom: 30px;
+        font-weight: 900;
+        text-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .value-content > p {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 1.3rem;
+        line-height: 1.7;
+        margin-bottom: 40px;
+    }
+
+    .value-list {
+        list-style: none;
+        padding: 0;
+        margin: 40px 0;
+    }
+
+    .value-list li {
+        padding: 20px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        font-size: 1.2rem;
+        color: rgba(255, 255, 255, 0.9);
+        transition: all 0.3s ease;
+    }
+
+    .value-list li:hover {
+        color: white;
+        transform: translateX(10px);
+    }
+
+    .value-list li:last-child {
+        border-bottom: none;
+    }
+
+    .value-list li i {
+        color: var(--agri-gold);
+        font-size: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .value-list li:hover i {
+        transform: scale(1.2) rotate(10deg);
+    }
+
+    /* Floating Elements Enhanced */
+    .floating-element {
+        position: absolute;
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    .floating-leaf {
+        width: 200px;
+        height: 200px;
+        background: url('https://cdn-icons-png.flaticon.com/512/2909/2909797.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        animation: floatAnimation 25s ease-in-out infinite;
+        filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
+    }
+
+    @keyframes floatAnimation {
+        0%, 100% { 
+            transform: translate(0, 0) rotate(0deg) scale(1);
+        }
+        25% { 
+            transform: translate(30px, 30px) rotate(90deg) scale(1.1);
+        }
+        50% { 
+            transform: translate(0, 60px) rotate(180deg) scale(1);
+        }
+        75% { 
+            transform: translate(-30px, 30px) rotate(270deg) scale(0.9);
+        }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+        .main-title {
+            font-size: 3.5rem;
+        }
+        
+        .value-container {
+            gap: 40px;
+        }
+    }
+
+    @media (max-width: 992px) {
+        .hero-section {
+            height: auto;
+            min-height: 100vh;
+            padding: 100px 20px;
+        }
+        
+        .hero-content {
+            padding: 40px 30px;
+        }
+        
+        .main-title {
+            font-size: 3rem;
+        }
+        
+        .section-title {
+            font-size: 2.8rem;
+        }
+        
+        .features-grid {
+            grid-template-columns: 1fr;
+            max-width: 500px;
+        }
+        
+        .value-container {
+            grid-template-columns: 1fr;
+        }
+        
+        .value-image {
+            height: 400px;
+            order: -1;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .main-title {
+            font-size: 2.5rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.2rem;
+        }
+        
+        .section-title {
+            font-size: 2.3rem;
+        }
+        
+        .cta-buttons {
+            flex-direction: column;
+        }
+        
+        .btn-primary, .btn-outline {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .stats-container {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .stats-container {
+            grid-template-columns: 1fr;
+        }
+        
+        .feature-card {
+            padding: 30px 20px;
+        }
+        
+        .value-content {
+            padding: 20px;
+        }
+        
+        .value-content h2 {
+            font-size: 2.5rem;
+        }
+    }
+
+    /* Scroll Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(60px) scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    @keyframes fadeIn {
+        from { 
+            opacity: 0; 
+            transform: scale(0.9);
+        }
+        to { 
+            opacity: 1; 
+            transform: scale(1);
+        }
+    }
+
+    .animate-fade-in-up {
+        animation: fadeInUp 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    .animate-fade-in {
+        animation: fadeIn 1.2s ease-out forwards;
+    }
+
+    .delay-1 { animation-delay: 0.2s; }
+    .delay-2 { animation-delay: 0.4s; }
+    .delay-3 { animation-delay: 0.6s; }
+    .delay-4 { animation-delay: 0.8s; }
+
+    /* Scroll Progress Indicator */
+    .scroll-indicator {
+        position: absolute;
+        bottom: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: white;
+        font-size: 0.9rem;
+        opacity: 0.7;
+        animation: bounce 2s infinite;
+        z-index: 10;
+    }
+
+    @keyframes bounce {
+        0%, 100% { transform: translateX(-50%) translateY(0); }
+        50% { transform: translateX(-50%) translateY(-10px); }
+    }
+
+    .scroll-indicator::after {
+        content: '↓';
+        display: block;
+        font-size: 1.5rem;
+        text-align: center;
+        margin-top: 5px;
+    }
+</style>
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-background-particles" id="particles"></div>
+    
+    <div class="floating-element floating-leaf" style="top: 10%; left: 5%;"></div>
+    <div class="floating-element floating-leaf" style="bottom: 20%; right: 8%; animation-delay: -5s; width: 150px; height: 150px;"></div>
+    <div class="floating-element floating-leaf" style="top: 30%; right: 15%; animation-delay: -12s; width: 120px; height: 120px; opacity: 0.7;"></div>
+    
+    <div class="hero-content animate-fade-in-up">
+        <h1 class="main-title">
+            Transform Your Land<br>
+            <span class="title-highlight">Maximize Your Harvest</span>
+        </h1>
+        <p class="hero-subtitle">
+            Harness the power of AI and satellite technology to unlock your farm's full potential. 
+            From solar energy optimization to precision agriculture, we provide complete solutions 
+            for sustainable and profitable farming.
+        </p>
+        <div class="cta-buttons">
+            <a href="{% url 'analyze' %}" class="btn-primary animate-fade-in-up delay-1">
+                <i class="fas fa-magic"></i>
+                Begin Your Transformation
+            </a>
+            {% if not user.is_authenticated %}
+            <a href="{% url 'signup' %}" class="btn-outline animate-fade-in-up delay-2">
+                <i class="fas fa-star"></i>
+                Join the Revolution
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="scroll-indicator animate-fade-in delay-3">
+        Discover More
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+    <div class="features-background"></div>
+    
+    <div class="section-header animate-fade-in-up">
+        <h2 class="section-title">Intelligent Farm Solutions</h2>
+        <p class="section-subtitle">Advanced technologies working in harmony to boost your agricultural productivity</p>
+    </div>
+    
+    <div class="features-grid">
+        <!-- Feature 1: Solar Analysis -->
+        <div class="feature-card animate-fade-in-up delay-1">
+            <div class="feature-image" style="background-image: url('https://images.unsplash.com/photo-1466611653911-95081537e5b7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80');"></div>
+            <div class="feature-content">
+                <div class="feature-icon">
+                    <i class="fas fa-sun"></i>
+                </div>
+                <h3>Solar Energy Intelligence</h3>
+                <p>
+                    Advanced solar mapping with real-time energy production forecasts. 
+                    Our AI calculates optimal panel placement and predicts 20-year ROI 
+                    with 98% accuracy.
+                </p>
+                <div class="feature-highlight">
+                    <i class="fas fa-bolt"></i>
+                    Energy Independence Achieved
+                </div>
+            </div>
+        </div>
+        
+        <!-- Feature 2: Wind Analysis -->
+        <div class="feature-card animate-fade-in-up delay-2">
+            <div class="feature-image" style="background-image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80');"></div>
+            <div class="feature-content">
+                <div class="feature-icon">
+                    <i class="fas fa-wind"></i>
+                </div>
+                <h3>Wind Power Optimization</h3>
+                <p>
+                    Comprehensive wind analysis using meteorological data and terrain modeling. 
+                    Identify perfect turbine locations for maximum energy generation year-round.
+                </p>
+                <div class="feature-highlight">
+                    <i class="fas fa-chart-line"></i>
+                    Smart Energy Forecasting
+                </div>
+            </div>
+        </div>
+        
+        <!-- Feature 3: Crop Intelligence -->
+        <div class="feature-card animate-fade-in-up delay-3">
+            <div class="feature-image" style="background-image: url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80');"></div>
+            <div class="feature-content">
+                <div class="feature-icon">
+                    <i class="fas fa-seedling"></i>
+                </div>
+                <h3>Precision Agriculture</h3>
+                <p>
+                    Machine learning algorithms analyze soil health, weather patterns, and 
+                    market trends to recommend optimal crops and planting strategies.
+                </p>
+                <div class="feature-highlight">
+                    <i class="fas fa-brain"></i>
+                    AI-Powered Insights
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats-section">
+    <div class="floating-element floating-leaf" style="top: 20%; left: 10%; animation-delay: -8s;"></div>
+    <div class="floating-element floating-leaf" style="bottom: 30%; right: 15%; animation-delay: -15s; width: 180px; height: 180px;"></div>
+    
+    <div class="stats-container">
+        <div class="stat-card animate-fade-in-up">
+            <div class="stat-number" data-count="75000">0</div>
+            <div class="stat-label">Acres Optimized</div>
+            <span class="stat-subtext">Transforming farmland nationwide</span>
+        </div>
+        
+        <div class="stat-card animate-fade-in-up delay-1">
+            <div class="stat-number" data-count="1500">0</div>
+            <div class="stat-label">Successful Farms</div>
+            <span class="stat-subtext">Thriving agricultural businesses</span>
+        </div>
+        
+        <div class="stat-card animate-fade-in-up delay-2">
+            <div class="stat-number" data-count="92">0</div>
+            <div class="stat-label">Average Yield Increase</div>
+            <span class="stat-subtext">Proven results, measurable growth</span>
+        </div>
+        
+        <div class="stat-card animate-fade-in-up delay-3">
+            <div class="stat-number" data-count="4.8">0</div>
+            <div class="stat-label">Farmer Satisfaction</div>
+            <span class="stat-subtext">Rated by 3,000+ farmers</span>
+        </div>
+    </div>
+</section>
+
+<!-- Value Proposition Section -->
+<section class="value-section">
+    <div class="floating-element floating-leaf" style="top: 15%; right: 10%; animation-delay: -10s;"></div>
+    
+    <div class="value-container">
+        <div class="value-image animate-fade-in-up"></div>
+        
+        <div class="value-content animate-fade-in-up delay-1">
+            <h2>The Future of Farming is Here</h2>
+            <p>
+                Experience the convergence of technology and agriculture. Our platform combines 
+                satellite imagery, AI analytics, and agricultural expertise to deliver unprecedented 
+                insights for your farming operation.
+            </p>
+            
+            <ul class="value-list">
+                <li>
+                    <i class="fas fa-rocket"></i>
+                    <span><strong>Zero Risk Start:</strong> Free comprehensive analysis with actionable insights</span>
+                </li>
+                <li>
+                    <i class="fas fa-handshake"></i>
+                    <span><strong>Personalized Guidance:</strong> Your dedicated farm success manager</span>
+                </li>
+                <li>
+                    <i class="fas fa-network-wired"></i>
+                    <span><strong>Integrated Ecosystem:</strong> Direct market access and supply chain integration</span>
+                </li>
+                <li>
+                    <i class="fas fa-leaf"></i>
+                    <span><strong>Sustainable Growth:</strong> Eco-solutions that preserve your land's legacy</span>
+                </li>
+                <li>
+                    <i class="fas fa-mobile-alt"></i>
+                    <span><strong>Anywhere Access:</strong> Full control from your mobile device</span>
+                </li>
+            </ul>
+            
+            <a href="{% url 'analyze' %}" class="btn-primary" style="margin-top: 30px;">
+                <i class="fas fa-play"></i>
+                Launch Your Success Story
+            </a>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Create floating particles
+    document.addEventListener('DOMContentLoaded', function() {
+        const particlesContainer = document.getElementById('particles');
+        if (particlesContainer) {
+            for (let i = 0; i < 15; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.width = `${Math.random() * 100 + 50}px`;
+                particle.style.height = particle.style.width;
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.animationDelay = `${Math.random() * 15}s`;
+                particle.style.animationDuration = `${Math.random() * 10 + 20}s`;
+                particle.style.opacity = Math.random() * 0.2 + 0.1;
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Enhanced number counting with progress bars
+        const counters = document.querySelectorAll('.stat-number');
+        
+        counters.forEach(counter => {
+            const updateCount = () => {
+                const target = parseFloat(counter.getAttribute('data-count'));
+                let count = 0;
+                const isDecimal = counter.textContent.includes('.');
+                const increment = target / 100;
+                
+                const timer = setInterval(() => {
+                    count += increment;
+                    
+                    if (isDecimal) {
+                        if (count >= target) {
+                            count = target;
+                            counter.textContent = target.toFixed(1) + '/5';
+                            clearInterval(timer);
+                        } else {
+                            counter.textContent = count.toFixed(1) + '/5';
+                        }
+                    } else {
+                        if (count >= target) {
+                            count = target;
+                            counter.textContent = Math.floor(count).toLocaleString();
+                            clearInterval(timer);
+                        } else {
+                            counter.textContent = Math.floor(count).toLocaleString();
+                        }
+                    }
+                }, 20);
+            };
+            
+            // Start animation when element is in viewport
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        updateCount();
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { 
+                threshold: 0.5,
+                rootMargin: '0px 0px -100px 0px'
+            });
+            
+            observer.observe(counter);
+        });
+        
+        // Enhanced scroll animations with parallax effect
+        const animateOnScroll = () => {
+            const elements = document.querySelectorAll('.feature-card, .stat-card, .value-content, .value-image, .section-header');
+            
+            elements.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 100;
+                
+                if (elementTop < window.innerHeight - elementVisible) {
+                    element.style.opacity = "1";
+                    element.style.transform = "translateY(0) scale(1)";
+                }
+            });
+            
+            // Parallax effect for hero section
+            const heroSection = document.querySelector('.hero-section');
+            const scrollY = window.scrollY;
+            if (heroSection) {
+                heroSection.style.backgroundPositionY = `${scrollY * 0.5}px`;
+            }
+        };
+        
+        // Set initial states for animation
+        document.querySelectorAll('.feature-card, .stat-card, .value-content, .value-image, .section-header').forEach(el => {
+            el.style.opacity = "0";
+            el.style.transform = "translateY(30px) scale(0.98)";
+            el.style.transition = "opacity 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275), transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
+        });
+        
+        // Initialize animations
+        window.addEventListener('scroll', animateOnScroll);
+        animateOnScroll();
+        
+        // Hover effect enhancement
+        document.querySelectorAll('.feature-card, .btn-primary, .btn-outline').forEach(el => {
+            el.addEventListener('mouseenter', function(e) {
+                const rect = this.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                this.style.setProperty('--mouse-x', `${x}px`);
+                this.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+        
+        // Remove scroll indicator after scroll
+        const scrollIndicator = document.querySelector('.scroll-indicator');
+        if (scrollIndicator) {
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 100) {
+                    scrollIndicator.style.opacity = '0';
+                    scrollIndicator.style.transform = 'translateX(-50%) translateY(20px)';
+                } else {
+                    scrollIndicator.style.opacity = '0.7';
+                    scrollIndicator.style.transform = 'translateX(-50%) translateY(0)';
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
