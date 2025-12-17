@@ -177,6 +177,7 @@
         from {
             opacity: 0;
         }
+
         to {
             opacity: 1;
         }
@@ -187,6 +188,7 @@
             opacity: 0;
             transform: translateY(20px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);
@@ -211,7 +213,8 @@
 
     /* 🔹 CHANGE 2 — ADD THIS CSS (VERY IMPORTANT) */
     .footer-spacer {
-        height: 90px;   /* match footer height */
+        height: 90px;
+        /* match footer height */
         width: 100%;
     }
 
@@ -221,11 +224,13 @@
             border-radius: 16px;
             margin: 0 10px;
         }
+
         .icon-circle {
             width: 40px;
             height: 40px;
             margin-right: 0.75rem;
         }
+
         .table-responsive {
             font-size: 0.9rem;
         }
@@ -233,7 +238,7 @@
 </style>
 
 <div class="container-fluid py-4">
-    
+
     <!-- ================= HEADER ================= -->
     <div class="row mb-5 fade-in">
         <div class="col-12">
@@ -285,7 +290,7 @@
                             </thead>
                             <tbody>
                                 {% for prop in proposals %}
-                                <tr class="slide-up" style="animation-delay: {{ forloop.counter|add:"0.2" }}s">
+                                <tr class="slide-up" style="animation-delay: {{ forloop.counter|add:" 0.2" }}s">
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <div class="icon-circle me-3" style="width: 35px; height: 35px;">
@@ -293,14 +298,16 @@
                                             </div>
                                             <div>
                                                 <div class="fw-bold text-dark">{{ prop.landowner.username }}</div>
-                                                <small class="text-muted">{{ prop.landowner.email|default:"No email" }}</small>
+                                                <small class="text-muted">{{ prop.landowner.email|default:"No email"
+                                                    }}</small>
                                             </div>
                                         </div>
                                     </td>
                                     <td>
                                         <div class="text-muted">
                                             <i class="fas fa-map-marker-alt me-1"></i>
-                                            {{ prop.land_analysis.latitude|floatformat:4 }}, {{ prop.land_analysis.longitude|floatformat:4 }}
+                                            {{ prop.land_analysis.latitude|floatformat:4 }}, {{
+                                            prop.land_analysis.longitude|floatformat:4 }}
                                         </div>
                                     </td>
                                     <td>
@@ -314,7 +321,8 @@
                                     </td>
                                     <td class="text-muted">{{ prop.created_at|date:"M d, Y" }}</td>
                                     <td class="text-end">
-                                        <a href="{% url 'proposal_detail' prop.id %}" class="btn btn-primary-glass btn-sm">
+                                        <a href="{% url 'proposal_detail' prop.id %}"
+                                            class="btn btn-primary-glass btn-sm">
                                             <i class="fas fa-eye me-1"></i> Review
                                         </a>
                                     </td>
@@ -329,8 +337,9 @@
                             <i class="fas fa-inbox fa-2x"></i>
                         </div>
                         <h5 class="fw-bold text-dark mb-3">No Proposals Received Yet</h5>
-                        <p class="text-muted mb-4">Landowners will send you proposals once they discover your profile.</p>
-                        <a href="{% url 'builder_profile' %}" class="btn btn-primary-glass">
+                        <p class="text-muted mb-4">Landowners will send you proposals once they discover your profile.
+                        </p>
+                        <a href="{% url 'dashboard' %}" class="btn btn-primary-glass">
                             <i class="fas fa-user-edit me-2"></i>Update Your Profile
                         </a>
                     </div>
