@@ -11,39 +11,30 @@ from django.contrib.staticfiles import finders
 
 from .forms import LandAnalysisForm, AdvancedSettingsForm
 from .models import LandAnalysis
+from utils.soil_analysis import get_soil_data, recommend_crops, estimate_agri_revenue
+from utils.energy_estimation import estimate_energy_potential, plot_to_base64, calculate_mixed_potential
 
-from utils.soil_analysis import (
-    get_soil_data,
-    recommend_crops,
-    estimate_agri_revenue
-)
-from utils.energy_estimation import (
-    estimate_energy_potential,
-    plot_to_base64,
-    calculate_mixed_potential
-)
-
-# -------------------------------------------------
-# Logging
-# -------------------------------------------------
+# 🔹 Logging setup
 logger = logging.getLogger(__name__)
 
 
-# -------------------------------------------------
-# PDF helper
-# -------------------------------------------------
+# 🔹 Helper for static/media files in PDF
 def link_callback(uri, rel):
+    """
+    Convert HTML URIs to absolute system paths for xhtml2pdf
+    """
     result = finders.find(uri)
     if result:
         if not isinstance(result, (list, tuple)):
             result = [result]
-        return os.path.realpath(result[0])
+        path = os.path.realpath(result[0])
+        return path
     return uri
 
 
-# =================================================
+# -------------------------------
 # VIEWS
-# =================================================
+# -------------------------------
 
 class IndexView(View):
     def get(self, request):
@@ -52,14 +43,25 @@ class IndexView(View):
 
 class AnalysisInputView(View):
     def get(self, request):
+        form = LandAnalysisForm()
+        advanced_form = AdvancedSettingsForm()
         return render(
             request,
             "potential_app/input_form.html",
-            {
-                "form": LandAnalysisForm(),
-                "advanced_form": AdvancedSettingsForm(),
-            },
+            {"form": form, "advanced_form": advanced_form},
         )
+    # def get(self, request, land_id=None):
+    #     form = LandAnalysisForm()
+    #     advanced_form = AdvancedSettingsForm()
+
+    #     if land_id:
+    #         from .models import Land
+    #         land = get_object_or_404(Land, id=land_id, owner=request.user)
+    #         form.initial = {
+    #             'latitude': land.latitude,
+    #             'longitude': land.longitude,
+    #             'area_m2': land.area_m2,
+    #         }
 
     def post(self, request):
         form = LandAnalysisForm(request.POST)
@@ -68,6 +70,7 @@ class AnalysisInputView(View):
         if form.is_valid() and advanced_form.is_valid():
             analysis = form.save(commit=False)
 
+            # Apply advanced settings
             for field in advanced_form.fields:
                 setattr(analysis, field, advanced_form.cleaned_data[field])
 
@@ -86,50 +89,23 @@ class ProcessAnalysisView(View):
         try:
             analysis = LandAnalysis.objects.get(id=analysis_id)
 
-            # -----------------------------
-            # SOIL DATA (SAFE STRUCTURE)
-            # -----------------------------
-            raw_soil = get_soil_data(analysis.latitude, analysis.longitude) or {}
-
-            soil_data = {}
-            for prop, value in raw_soil.items():
-                if isinstance(value, dict):
-                    soil_data[prop] = value
-                else:
-                    soil_data[prop] = {
-                        "0-5cm": value,
-                        "5-15cm": value,
-                        "15-30cm": value,
-                    }
-
+            # Soil data
+            soil_data = get_soil_data(analysis.latitude, analysis.longitude)
             analysis.soil_data = soil_data
 
-            # -----------------------------
-            # CROP RECOMMENDATIONS
-            # -----------------------------
-            try:
-                crop_recommendations = recommend_crops(soil_data) or []
-            except Exception:
-                crop_recommendations = []
-
+            # Crop recommendations
+            crop_recommendations = recommend_crops(soil_data)
             analysis.crop_recommendations = crop_recommendations
 
-            # -----------------------------
-            # ENERGY ESTIMATION
-            # -----------------------------
+            # Energy estimation
             try:
-                area_m2 = (
-                    analysis.area_m2
-                    or (analysis.area_ha * 10000 if analysis.area_ha else 0)
-                )
-                area_ha = area_m2 / 10000 if area_m2 else 0
-
                 energy_results = estimate_energy_potential(
                     lat=analysis.latitude,
                     lon=analysis.longitude,
                     start_date=analysis.start_date.strftime("%Y-%m-%d"),
                     end_date=analysis.end_date.strftime("%Y-%m-%d"),
-                    area_m2=area_m2,
+                    area_m2=analysis.area_m2
+                    or (analysis.area_ha * 10000 if analysis.area_ha else 0),
                     pv_config={
                         "efficiency": analysis.pv_efficiency,
                         "performance_ratio": analysis.pv_performance_ratio,
@@ -147,73 +123,46 @@ class ProcessAnalysisView(View):
                         "system_efficiency": analysis.wind_system_efficiency,
                     },
                     dc_voltage=analysis.dc_voltage,
-                ) or {}
+                )
+
+                if not energy_results or energy_results.get("total_energy_kwh", 0) == 0:
+                    logger.warning("⚠️ Energy estimation returned zero. Check API/data.")
+
+                # Agri Revenue
+                area_ha = analysis.area_ha or (analysis.area_m2 / 10000.0 if analysis.area_m2 else 0)
+                agri_revenue_results = estimate_agri_revenue(crop_recommendations, area_ha)
+
+                # Mixed Potential
+                mixed_results = calculate_mixed_potential(energy_results, agri_revenue_results, area_ha)
+
+                # Merge results
+                energy_results["agri_revenue"] = agri_revenue_results
+                energy_results["mixed_analysis"] = mixed_results
+
+                analysis.energy_results = energy_results
 
             except Exception as e:
-                logger.error("Energy estimation failed")
+                logger.error(f"Energy estimation failed: {str(e)}")
                 logger.error(traceback.format_exc())
-                energy_results = {}
-
-            # -----------------------------
-            # NORMALIZE ENERGY RESULTS
-            # -----------------------------
-            energy_results.setdefault("total_energy_kwh", 0)
-            energy_results.setdefault("pv_energy_kwh", 0)
-            energy_results.setdefault("wind_energy_kwh", 0)
-            energy_results.setdefault("total_revenue", 0)
-            energy_results.setdefault("monthly_breakdown", [])
-            energy_results.setdefault("hourly_plot", "")
-            energy_results.setdefault("daily_plot", "")
-
-            # Normalize monthly breakdown
-            normalized_months = []
-            for item in energy_results.get("monthly_breakdown", []):
-                normalized_months.append({
-                    "month": item.get("month", ""),
-                    "energy": item.get(
-                        "energy",
-                        item.get("pv_energy_kwh", 0) + item.get("wind_energy_kwh", 0)
-                    ),
-                    "revenue": item.get(
-                        "revenue",
-                        item.get("revenue_inr", 0)
-                    ),
-                    "pv_energy_kwh": item.get("pv_energy_kwh", 0),
-                    "wind_energy_kwh": item.get("wind_energy_kwh", 0),
-                })
-
-            energy_results["monthly_breakdown"] = normalized_months
-
-            # -----------------------------
-            # AGRI + MIXED REVENUE
-            # -----------------------------
-            try:
-                agri_revenue = estimate_agri_revenue(crop_recommendations, area_ha) or {
-                    "details": []
+                analysis.energy_results = {
+                    "total_energy_kwh": 0,
+                    "pv_energy_kwh": 0,
+                    "wind_energy_kwh": 0,
+                    "total_revenue": 0,
+                    "monthly_breakdown": [],
+                    "hourly_plot": "",
+                    "daily_plot": "",
+                    "agri_revenue": {},
+                    "mixed_analysis": {}
                 }
-            except Exception:
-                agri_revenue = {"details": []}
 
-            try:
-                mixed_analysis = calculate_mixed_potential(
-                    energy_results, agri_revenue, area_ha
-                ) or {"scenarios": [], "best_scenario": {}}
-            except Exception:
-                mixed_analysis = {"scenarios": [], "best_scenario": {}}
-
-            energy_results["agri_revenue"] = agri_revenue
-            energy_results["mixed_analysis"] = mixed_analysis
-
-            analysis.energy_results = energy_results
             analysis.save()
-
             return redirect("results", analysis_id=analysis.id)
 
         except LandAnalysis.DoesNotExist:
             return redirect("index")
         except Exception as e:
-            logger.error("ProcessAnalysis failed")
-            logger.error(traceback.format_exc())
+            logger.error(f"Process analysis failed: {str(e)}")
             return redirect("index")
 
 
@@ -221,11 +170,19 @@ class ResultsView(View):
     def get(self, request, analysis_id):
         try:
             analysis = LandAnalysis.objects.get(id=analysis_id)
-
             energy_results = analysis.energy_results or {}
-            energy_results.setdefault("agri_revenue", {"details": []})
-            energy_results.setdefault("mixed_analysis", {})
+
+            if not isinstance(energy_results, dict):
+                energy_results = {}
+
+            # Ensure defaults
+            energy_results.setdefault("total_energy_kwh", 0)
+            energy_results.setdefault("pv_energy_kwh", 0)
+            energy_results.setdefault("wind_energy_kwh", 0)
+            energy_results.setdefault("total_revenue", 0)
             energy_results.setdefault("monthly_breakdown", [])
+            energy_results.setdefault("hourly_plot", "")
+            energy_results.setdefault("daily_plot", "")
 
             context = {
                 "analysis": analysis,
@@ -240,25 +197,26 @@ class ResultsView(View):
 
 
 class ReportView(View):
+    """ ✅ Browser view of report (same template as PDF) """
     def get(self, request, analysis_id):
         try:
             analysis = LandAnalysis.objects.get(id=analysis_id)
-            return render(
-                request,
-                "potential_app/report_template.html",
-                {
-                    "analysis": analysis,
-                    "soil_data": analysis.soil_data or {},
-                    "crop_recommendations": analysis.crop_recommendations or [],
-                    "energy_results": analysis.energy_results or {},
-                },
-            )
+            context = {
+                "analysis": analysis,
+                "soil_data": analysis.soil_data or {},
+                "crop_recommendations": analysis.crop_recommendations or [],
+                "energy_results": analysis.energy_results or {},
+            }
+            return render(request, "potential_app/report_template.html", context)
+
         except LandAnalysis.DoesNotExist:
             return redirect("index")
 
 
 class ReportDownloadView(View):
+    """ ✅ Generate downloadable PDF report """
     def get(self, request, analysis_id):
+        # 🔹 Lazy imports: only when user actually downloads PDF
         import matplotlib.pyplot as plt
         from xhtml2pdf import pisa
 
@@ -266,34 +224,93 @@ class ReportDownloadView(View):
             analysis = LandAnalysis.objects.get(id=analysis_id)
             energy_results = analysis.energy_results or {}
 
-            fig, ax = plt.subplots(figsize=(10, 6))
-            months = [m["month"] for m in energy_results.get("monthly_breakdown", [])]
-            revenue = [m["revenue"] for m in energy_results.get("monthly_breakdown", [])]
+            # --------------------
+            # Create detailed plots
+            # --------------------
+            fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(15, 12))
 
-            ax.plot(months, revenue, marker="o")
-            ax.set_title("Monthly Revenue Projection")
-            ax.set_ylabel("Revenue (₹)")
-            ax.grid(True)
+            # Monthly breakdown
+            monthly_breakdown = energy_results.get("monthly_breakdown", [])
+            if monthly_breakdown:
+                months = [item.get("month", "") for item in monthly_breakdown]
+                pv_energy = [item.get("pv_energy_kwh", 0) for item in monthly_breakdown]
+                wind_energy = [item.get("wind_energy_kwh", 0) for item in monthly_breakdown]
 
-            plot_img = plot_to_base64(fig)
-            plt.close(fig)
+                ax1.bar(months, pv_energy, label="PV Energy", alpha=0.7, color="orange")
+                ax1.bar(months, wind_energy, bottom=pv_energy, label="Wind Energy", alpha=0.7, color="green")
+                ax1.set_title("Monthly Energy Generation")
+                ax1.set_ylabel("Energy (kWh)")
+                ax1.tick_params(axis="x", rotation=45)
+                ax1.legend()
+                ax1.grid(True, alpha=0.3)
 
+                # Revenue
+                revenue = [item.get("revenue_inr", 0) for item in monthly_breakdown]
+                ax2.plot(months, revenue, marker="o", color="blue", linewidth=2)
+                ax2.set_title("Monthly Revenue Projection")
+                ax2.set_ylabel("Revenue (₹)")
+                ax2.tick_params(axis="x", rotation=45)
+                ax2.grid(True, alpha=0.3)
+
+            # Energy distribution
+            pv_energy = energy_results.get("pv_energy_kwh", 0)
+            wind_energy = energy_results.get("wind_energy_kwh", 0)
+            if pv_energy > 0 or wind_energy > 0:
+                labels = ["PV Energy", "Wind Energy"]
+                sizes = [pv_energy, wind_energy]
+                colors = ["orange", "green"]
+                ax3.pie(sizes, labels=labels, colors=colors, autopct="%1.1f%%", startangle=90)
+                ax3.set_title("Energy Distribution")
+                ax3.axis("equal")
+
+            # Soil properties
+            soil_data = analysis.soil_data or {}
+            if soil_data:
+                soil_props = list(soil_data.keys())
+                prop_values = [
+                    (sum(soil_data[prop].values()) / len(soil_data[prop])) if soil_data[prop] else 0
+                    for prop in soil_props
+                ]
+                ax4.bar(soil_props, prop_values, color=["red", "blue", "green", "purple", "brown"])
+                ax4.set_title("Average Soil Properties")
+                ax4.tick_params(axis="x", rotation=45)
+                ax4.grid(True, alpha=0.3)
+
+            plt.tight_layout()
+            detailed_plots = plot_to_base64(fig)
+            plt.close(fig)   # ✅ free memory
+
+            # --------------------
+            # Prepare context for PDF
+            # --------------------
             context = {
                 "analysis": analysis,
-                "soil_data": analysis.soil_data or {},
+                "soil_data": soil_data,
                 "crop_recommendations": analysis.crop_recommendations or [],
                 "energy_results": energy_results,
-                "detailed_plots": plot_img,
+                "hourly_plot": energy_results.get("hourly_plot", ""),
+                "daily_plot": energy_results.get("daily_plot", ""),
+                "detailed_plots": detailed_plots,
             }
 
-            html = render_to_string("potential_app/report_template.html", context)
+            # Render HTML → PDF
+            html_string = render_to_string("potential_app/report_template.html", context)
             response = HttpResponse(content_type="application/pdf")
-            response["Content-Disposition"] = f'attachment; filename="report_{analysis_id}.pdf"'
+            response["Content-Disposition"] = f'attachment; filename="land_analysis_report_{analysis_id}.pdf"'
 
-            pisa.CreatePDF(html, dest=response, link_callback=link_callback)
+            pisa_status = pisa.CreatePDF(
+                html_string,
+                dest=response,
+                link_callback=link_callback
+            )
+            if pisa_status.err:
+                return HttpResponse("⚠️ Error generating PDF report", status=500)
+
             return response
 
-        except Exception:
-            logger.error("PDF generation failed")
+        except LandAnalysis.DoesNotExist:
+            return redirect("index")
+        except Exception as e:
+            logger.error(f"PDF generation failed: {str(e)}")
             logger.error(traceback.format_exc())
-            return HttpResponse("PDF generation error", status=500)
+            return HttpResponse("⚠️ Error generating PDF report", status=500)

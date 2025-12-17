@@ -565,6 +565,7 @@
                     <div class="stat-card">
                         <div class="stat-label">Total Revenue</div>
                         <div class="stat-value">₹{{ energy_results.total_revenue|default:"0" }}</div>
+                        <!-- <div class="stat-value">₹{{ energy_results.total_revenue_inr|default:"0"|floatformat:0 }}</div> -->
                         <i class="fas fa-rupee-sign"></i>
                     </div>
                 </div>
@@ -586,7 +587,9 @@
                             <td>{{ month.month }}</td>
                             <td>{{ month.pv_energy_kwh }}</td>
                             <td>{{ month.wind_energy_kwh }}</td>
-                            <td>{{ month.revenue }}</td>
+                            <!-- <td>{{ month.revenue }}</td> -->
+                            <td>₹{{ month.revenue_inr|default:"0"|floatformat:0 }}</td>
+
                         </tr>
                         {% endfor %}
                     </tbody>

@@ -4,6 +4,7 @@
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-10">
+
             <!-- Status Header -->
             <div class="card mb-4 border-0 shadow-sm glass-card bg-light">
                 <div class="card-body d-flex justify-content-between align-items-center">
@@ -11,11 +12,17 @@
                         <small class="text-muted text-uppercase fw-bold">Current Status</small>
                         <h4 class="mb-0 mt-1">
                             {% if proposal.status == 'accepted' %}
-                            <span class="text-success"><i class="fas fa-check-circle me-2"></i>Accepted</span>
+                                <span class="text-success">
+                                    <i class="fas fa-check-circle me-2"></i>Accepted
+                                </span>
                             {% elif proposal.status == 'rejected' %}
-                            <span class="text-danger"><i class="fas fa-times-circle me-2"></i>Rejected</span>
+                                <span class="text-danger">
+                                    <i class="fas fa-times-circle me-2"></i>Rejected
+                                </span>
                             {% else %}
-                            <span class="text-warning"><i class="fas fa-clock me-2"></i>Pending Review</span>
+                                <span class="text-warning">
+                                    <i class="fas fa-clock me-2"></i>Pending Review
+                                </span>
                             {% endif %}
                         </h4>
                     </div>
@@ -26,21 +33,32 @@
                 </div>
             </div>
 
-            <!-- Proposal Details -->
             <div class="row">
+
+                <!-- LEFT COLUMN -->
                 <div class="col-md-8">
+
+                    <!-- Proposal Details -->
                     <div class="card mb-4 border-0 shadow-sm glass-card">
                         <div class="card-header bg-transparent">
                             <h5 class="mb-0">Proposal Details</h5>
                         </div>
                         <div class="card-body">
+
                             <div class="mb-4">
                                 <label class="fw-bold text-muted small">Land Details</label>
-                                <p class="mb-1 fs-5">{{ proposal.land_analysis.land.name|default:"Selected Land" }}</p>
-                                <p class="mb-0"><i class="fas fa-map-marker-alt me-2 text-primary"></i> {{
-                                    proposal.land_analysis.latitude }}, {{ proposal.land_analysis.longitude }}</p>
-                                <p class="mb-0"><i class="fas fa-ruler-combined me-2 text-secondary"></i> {{
-                                    proposal.land_analysis.area_m2|default:"--" }} m²</p>
+                                <p class="mb-1 fs-5">
+                                    {{ proposal.land_analysis.land.name|default:"Selected Land" }}
+                                </p>
+                                <p class="mb-0">
+                                    <i class="fas fa-map-marker-alt me-2 text-primary"></i>
+                                    {{ proposal.land_analysis.latitude }},
+                                    {{ proposal.land_analysis.longitude }}
+                                </p>
+                                <p class="mb-0">
+                                    <i class="fas fa-ruler-combined me-2 text-secondary"></i>
+                                    {{ proposal.land_analysis.area_m2|default:"--" }} m²
+                                </p>
                             </div>
 
                             <div class="mb-4">
@@ -53,123 +71,126 @@
                             {% if proposal.builder_response_message %}
                             <div class="mb-4">
                                 <label class="fw-bold text-muted small">Response from Builder</label>
-                                <div
-                                    class="p-3 bg-white border rounded mt-1 border-start border-4 border-{{ proposal.status|yesno:'success,danger,warning' }}">
+                                <div class="p-3 bg-white border rounded mt-1">
                                     {{ proposal.builder_response_message|linebreaks }}
                                 </div>
                             </div>
                             {% endif %}
+
                         </div>
                     </div>
 
-                    <!-- Bond Section (Visible only if Accepted) -->
+                    <!-- Bond Section -->
                     {% if proposal.status == 'accepted' %}
-                    <div class="card mb-4 border-0 shadow-sm glass-card animate-fade-in">
+                    <div class="card mb-4 border-0 shadow-sm glass-card">
                         <div class="card-header bg-success text-white">
-                            <h5 class="mb-0"><i class="fas fa-file-contract me-2"></i>Investment & Bond</h5>
+                            <h5 class="mb-0">
+                                <i class="fas fa-file-contract me-2"></i>Investment & Bond
+                            </h5>
                         </div>
                         <div class="card-body">
+
                             {% if proposal.bond %}
-                            <div class="text-center py-4">
-                                <div class="mb-3 text-success" style="font-size: 3rem;"><i
-                                        class="fas fa-file-signature"></i></div>
-                                <h4>Bond Generated Successfully!</h4>
-                                <p class="text-muted">A legal bond has been created between {{
-                                    proposal.landowner.username }} and {{ proposal.builder.username }}.</p>
-                                <div class="alert alert-light border">
-                                    <strong>Investment Model:</strong> {{ proposal.get_investment_choice_display }}
+                                <div class="text-center py-4">
+                                    <i class="fas fa-file-signature text-success" style="font-size:3rem;"></i>
+                                    <h4 class="mt-3">Bond Generated Successfully!</h4>
+                                    <p class="text-muted">
+                                        A legal bond has been created between
+                                        {{ proposal.landowner.username }} and
+                                        {{ proposal.builder.username }}.
+                                    </p>
+                                    <div class="alert alert-light border">
+                                        <strong>Investment Model:</strong>
+                                        {{ proposal.get_investment_choice_display }}
+                                    </div>
+                                    <button class="btn btn-outline-success" disabled>
+                                        Download Bond (Demo)
+                                    </button>
                                 </div>
-                                <button class="btn btn-outline-success" disabled>Download Bond (Demo)</button>
-                            </div>
+
                             {% else %}
-                            <!-- Landowner Choice -->
-                            {% if request.user == proposal.landowner and not proposal.investment_choice or
-                            proposal.investment_choice == 'pending' %}
-                            <div class="text-center">
-                                <h5 class="mb-4">Choose your Investment Path</h5>
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <div class="card h-100 border-success">
-                                            <div class="card-body">
-                                                <h6>Self Investment</h6>
-                                                <p class="small text-muted">You invest full capital. Builder constructs.
-                                                    You own 100% revenue.</p>
-                                                <form method="post">{% csrf_token %}
-                                                    <input type="hidden" name="action" value="choose_self">
-                                                    <button class="btn btn-success w-100">Select & Sign Bond</button>
-                                                </form>
+
+                                {% if request.user == proposal.landowner %}
+                                    {% if not proposal.investment_choice or proposal.investment_choice == 'pending' %}
+
+                                        <div class="text-center">
+                                            <h5 class="mb-4">Choose your Investment Path</h5>
+                                            <div class="row g-3">
+
+                                                <div class="col-md-6">
+                                                    <div class="card h-100 border-success">
+                                                        <div class="card-body">
+                                                            <h6>Self Investment</h6>
+                                                            <p class="small text-muted">
+                                                                You invest full capital. Builder constructs.
+                                                            </p>
+                                                            <form method="post">
+                                                                {% csrf_token %}
+                                                                <input type="hidden" name="action" value="choose_self">
+                                                                <button class="btn btn-success w-100">
+                                                                    Select & Sign Bond
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <div class="card h-100 border-primary">
+                                                        <div class="card-body">
+                                                            <h6>Builder Investment</h6>
+                                                            <p class="small text-muted">
+                                                                Builder invests. You get profit share.
+                                                            </p>
+                                                            <form method="post">
+                                                                {% csrf_token %}
+                                                                <input type="hidden" name="action" value="choose_builder">
+                                                                <button class="btn btn-primary w-100">
+                                                                    Select & Sign Bond
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="card h-100 border-primary">
-                                            <div class="card-body">
-                                                <h6>Builder Investment</h6>
-                                                <p class="small text-muted">Builder invests. You get lease/profit share.
-                                                    Ownership transfers later.</p>
-                                                <form method="post">{% csrf_token %}
-                                                    <input type="hidden" name="action" value="choose_builder">
-                                                    <button class="btn btn-primary w-100">Select & Sign Bond</button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            {% elif proposal.investment_choice %}
-                            <p class="text-center text-muted">Waiting for Bond generation...</p>
+
+                                    {% else %}
+                                        <p class="text-center text-muted">
+                                            Waiting for Bond generation...
+                                        </p>
+                                    {% endif %}
+                                {% endif %}
+
                             {% endif %}
-                            {% endif %}
+
                         </div>
                     </div>
                     {% endif %}
                 </div>
 
-                <!-- Sidebar Actions -->
+                <!-- RIGHT SIDEBAR -->
                 <div class="col-md-4">
-                    <!-- Builder Actions -->
+
                     {% if request.user == proposal.builder and proposal.status == 'pending_builder' %}
                     <div class="card border-0 shadow-sm glass-card">
                         <div class="card-header bg-transparent">
                             <h5 class="mb-0">Actions</h5>
                         </div>
                         <div class="card-body">
-                            <p class="small text-muted">Review the land details and coordinates before responding.</p>
-                            <div class="d-grid gap-2">
-                                <form method="post">{% csrf_token %}
-                                    <input type="hidden" name="action" value="accept">
-                                    <button class="btn btn-success w-100 mb-2">Accept Proposal</button>
-                                </form>
-                                <form method="post">{% csrf_token %}
-                                    <input type="hidden" name="action" value="reject">
-                                    <button class="btn btn-outline-danger w-100">Reject Proposal</button>
-                                </form>
-                            </div>
+                            <form method="post">{% csrf_token %}
+                                <input type="hidden" name="action" value="accept">
+                                <button class="btn btn-success w-100 mb-2">Accept Proposal</button>
+                            </form>
+                            <form method="post">{% csrf_token %}
+                                <input type="hidden" name="action" value="reject">
+                                <button class="btn btn-outline-danger w-100">Reject Proposal</button>
+                            </form>
                         </div>
                     </div>
                     {% endif %}
 
-                    <!-- Participants -->
-                    <div class="card mt-3 border-0 shadow-sm">
-                        <div class="card-body">
-                            <h6 class="fw-bold mb-3">Participants</h6>
-                            <div class="d-flex align-items-center mb-3">
-                                <div class="bg-light rounded-circle p-2 me-2"><i class="fas fa-user"></i></div>
-                                <div>
-                                    <div class="small text-muted">Landowner</div>
-                                    <div class="fw-bold">{{ proposal.landowner.username }}</div>
-                                </div>
-                            </div>
-                            <div class="d-flex align-items-center">
-                                <div class="bg-light rounded-circle p-2 me-2"><i class="fas fa-hard-hat"></i></div>
-                                <div>
-                                    <div class="small text-muted">Builder</div>
-                                    <div class="fw-bold">{{ proposal.builder.username }}</div>
-                                    <div class="small">{{ proposal.builder.builder_profile.company_name }}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

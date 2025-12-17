@@ -3,24 +3,26 @@
 {% block content %}
 <style>
     :root {
+        /* Adjusted colors for better contrast */
         --primary: #27ae60;
         --secondary: #2ecc71;
         --accent: #16a085;
-        --dark-green: #2c3e50;
-        --light-green: #d5f4e6;
-        --glass-bg: rgba(255, 255, 255, 0.85);
-        --glass-border: rgba(255, 255, 255, 0.25);
-        --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-        --text-dark: #2c3e50;
-        --text-muted: #5a6c7d;
+        --dark-green: #1e3a2c; /* Darkened for better contrast */
+        --light-green: #e8f5e9; /* Lightened for better contrast */
+        --glass-bg: rgba(255, 255, 255, 0.92); /* Increased opacity */
+        --glass-border: rgba(39, 174, 96, 0.3); /* Changed to green tint */
+        --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.25); /* Darker shadow */
+        --text-dark: #1e3a2c; /* Darkened text */
+        --text-muted: #4a6358; /* Darker muted text */
     }
 
     body {
-        background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+        background: linear-gradient(135deg, #2e7d32 0%, #a8e6cf 100%); /* Darker gradient start */
         background-attachment: fixed;
         min-height: 100vh;
     }
 
+    /* MAIN CONTAINER - FIXED FOR BETTER VISIBILITY */
     .glass-container {
         background: var(--glass-bg);
         backdrop-filter: blur(12px);
@@ -29,36 +31,57 @@
         border: 1px solid var(--glass-border);
         box-shadow: var(--shadow);
         overflow: hidden;
+        color: var(--text-dark); /* Ensure text color */
     }
 
     .glass-card {
-        background: rgba(255, 255, 255, 0.9);
+        background: rgba(255, 255, 255, 0.95); /* More opaque */
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
         border-radius: 16px;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        border: 1px solid rgba(39, 174, 96, 0.25); /* Green border */
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
         transition: all 0.3s ease;
+        color: var(--text-dark); /* Ensure text color */
     }
 
     .glass-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.25);
+        box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.3);
     }
 
     .glass-metric {
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
         border-radius: 16px;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+        border: 1px solid rgba(39, 174, 96, 0.2);
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
         transition: all 0.3s ease;
+        color: var(--text-dark); /* Ensure text color */
     }
 
     .glass-metric:hover {
         transform: translateY(-3px);
-        box-shadow: 0 10px 30px 0 rgba(46, 204, 113, 0.2);
+        box-shadow: 0 10px 30px 0 rgba(46, 204, 113, 0.25);
+    }
+
+    /* TEXT CONTRAST FIXES */
+    h1, h2, h3, h4, h5, h6 {
+        color: var(--dark-green) !important;
+        font-weight: 600;
+    }
+
+    .text-dark {
+        color: var(--dark-green) !important;
+    }
+
+    .text-muted {
+        color: var(--text-muted) !important;
+    }
+
+    .fw-bold, .fw-semibold {
+        color: var(--dark-green) !important;
     }
 
     .gradient-badge {
@@ -70,7 +93,7 @@
     }
 
     .progress-glass {
-        background: rgba(255, 255, 255, 0.4);
+        background: rgba(0, 0, 0, 0.1);
         border-radius: 10px;
         overflow: hidden;
         height: 10px;
@@ -83,11 +106,12 @@
     }
 
     .chart-container {
-        background: rgba(255, 255, 255, 0.7);
+        background: rgba(255, 255, 255, 0.85);
         backdrop-filter: blur(5px);
         border-radius: 12px;
         padding: 1rem;
         height: 200px;
+        border: 1px solid rgba(39, 174, 96, 0.15);
     }
 
     /* Animation classes */
@@ -119,23 +143,27 @@
         }
     }
 
-    /* Custom table styling */
+    /* Custom table styling - IMPROVED CONTRAST */
     .table-glass {
-        background: rgba(255, 255, 255, 0.6);
+        background: rgba(255, 255, 255, 0.9);
         border-radius: 12px;
         overflow: hidden;
+        border: 1px solid rgba(39, 174, 96, 0.15);
     }
 
     .table-glass th {
-        background: rgba(39, 174, 96, 0.1);
+        background: rgba(39, 174, 96, 0.15);
         border: none;
         font-weight: 600;
         color: var(--dark-green);
+        padding: 1rem;
     }
 
     .table-glass td {
         border: none;
         padding: 0.75rem;
+        color: var(--text-dark);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     }
 
     .table-glass tbody tr {
@@ -148,9 +176,9 @@
 
     /* Button styling */
     .btn-glass {
-        background: rgba(255, 255, 255, 0.8);
+        background: rgba(255, 255, 255, 0.9);
         backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        border: 1px solid rgba(39, 174, 96, 0.3);
         border-radius: 10px;
         color: var(--dark-green);
         font-weight: 500;
@@ -158,9 +186,9 @@
     }
 
     .btn-glass:hover {
-        background: rgba(255, 255, 255, 0.9);
+        background: rgba(255, 255, 255, 1);
         transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 5px 15px rgba(39, 174, 96, 0.2);
     }
 
     .btn-primary-glass {
@@ -185,7 +213,7 @@
         align-items: center;
         justify-content: center;
         margin-right: 1rem;
-        background: rgba(255, 255, 255, 0.7);
+        background: rgba(255, 255, 255, 0.8);
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     }
 
@@ -209,24 +237,12 @@
         color: white;
     }
 
-    /* Leaf pattern overlay */
-    .leaf-pattern::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%2327ae60' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
-        opacity: 0.3;
-        pointer-events: none;
-        z-index: -1;
-    }
-
-    /* Header styling */
+    /* Header styling - IMPROVED CONTRAST */
     .header-container {
         position: relative;
         overflow: hidden;
+        background: rgba(255, 255, 255, 0.95) !important; /* White background */
+        color: var(--text-dark) !important;
     }
 
     .header-container::before {
@@ -252,7 +268,7 @@
         color: var(--primary);
     }
 
-    /* New layout styles */
+    /* Section styles */
     .section-spacing {
         margin-bottom: 2.5rem;
     }
@@ -260,7 +276,7 @@
     .section-header {
         margin-bottom: 1.5rem;
         padding-bottom: 0.75rem;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        border-bottom: 2px solid rgba(39, 174, 96, 0.15);
     }
 
     .compact-table th,
@@ -284,9 +300,11 @@
         align-items: center;
         justify-content: space-between;
         padding: 0.5rem 0.75rem;
-        background: rgba(255, 255, 255, 0.7);
+        background: rgba(255, 255, 255, 0.8);
         border-radius: 8px;
         font-size: 0.85rem;
+        color: var(--text-dark);
+        border: 1px solid rgba(39, 174, 96, 0.15);
     }
 
     .energy-distribution {
@@ -297,8 +315,11 @@
     }
 
     .revenue-highlight {
-        background: linear-gradient(135deg, rgba(39, 174, 96, 0.1), rgba(22, 160, 133, 0.1));
+        background: linear-gradient(135deg, rgba(39, 174, 96, 0.15), rgba(22, 160, 133, 0.15));
         border-left: 4px solid var(--primary);
+        padding: 1.5rem;
+        border-radius: 12px;
+        color: var(--dark-green);
     }
 
     .monthly-table {
@@ -317,9 +338,11 @@
 
     .card-header {
         padding: 1.25rem 1.5rem;
+        background: rgba(255, 255, 255, 0.9) !important;
+        border-bottom: 2px solid rgba(39, 174, 96, 0.15);
     }
 
-    /* Responsive adjustments */
+    /* RESPONSIVE FIXES */
     @media (max-width: 768px) {
         .glass-container {
             border-radius: 16px;
@@ -338,10 +361,29 @@
         }
     }
 
-    /* 🔹 CHANGE 2 — ADD THIS CSS (VERY IMPORTANT) */
+    /* FOOTER SPACER */
     .footer-spacer {
-        height: 90px;   /* match footer height */
+        height: 90px;
         width: 100%;
+    }
+
+    /* SPECIFIC FIX FOR DARK TEXT */
+    .text-dark, .h2, .h5, .fw-bold, .fw-semibold {
+        color: #1e3a2c !important;
+    }
+    
+    small.text-muted {
+        color: #4a6358 !important;
+    }
+    
+    /* Ensure all text in cards is visible */
+    .glass-card *:not(.btn):not(.icon-circle) {
+        color: var(--text-dark) !important;
+    }
+    
+    /* Fix for table text */
+    .table-glass td, .table-glass th {
+        color: var(--text-dark) !important;
     }
 </style>
 
@@ -351,7 +393,7 @@
     <!-- ================= HEADER ================= -->
     <div class="row mb-5 fade-in">
         <div class="col-12">
-            <div class="glass-container p-4 header-container leaf-pattern">
+            <div class="glass-container p-4 header-container">
                 <div class="d-flex justify-content-between align-items-start mb-4">
                     <div class="d-flex align-items-center">
                         <div class="icon-circle icon-primary me-3">
@@ -366,7 +408,7 @@
                     </div>
 
                     {% if analysis.id %}
-                    <a href="{% url 'report' analysis.id %}" class="btn btn-glass">
+                    <a href="{% url 'report' analysis.id %}" class="btn btn-primary-glass">
                         <i class="fas fa-file-excel me-2"></i>PDF Report
                     </a>
                     {% endif %}
@@ -378,7 +420,7 @@
                             <i class="fas fa-map-marker-alt leaf-icon me-3 fs-5"></i>
                             <div>
                                 <small class="text-muted d-block">Location</small>
-                                <span class="fw-semibold">{{ analysis.latitude|floatformat:4 }}°, {{ analysis.longitude|floatformat:4 }}°</span>
+                                <span class="fw-semibold text-dark">{{ analysis.latitude|floatformat:4 }}°, {{ analysis.longitude|floatformat:4 }}°</span>
                             </div>
                         </div>
                     </div>
@@ -387,7 +429,7 @@
                             <i class="fas fa-calendar-alt leaf-icon me-3 fs-5"></i>
                             <div>
                                 <small class="text-muted d-block">Analysis Period</small>
-                                <span class="fw-semibold">{{ analysis.start_date }} to {{ analysis.end_date }}</span>
+                                <span class="fw-semibold text-dark">{{ analysis.start_date }} to {{ analysis.end_date }}</span>
                             </div>
                         </div>
                     </div>
@@ -396,7 +438,7 @@
                             <i class="fas fa-clock leaf-icon me-3 fs-5"></i>
                             <div>
                                 <small class="text-muted d-block">Analyzed</small>
-                                <span class="fw-semibold">{{ analysis.created_at|date:"M d, Y" }}</span>
+                                <span class="fw-semibold text-dark">{{ analysis.created_at|date:"M d, Y" }}</span>
                             </div>
                         </div>
                     </div>
@@ -405,7 +447,7 @@
                             <i class="fas fa-hashtag leaf-icon me-3 fs-5"></i>
                             <div>
                                 <small class="text-muted d-block">Analysis ID</small>
-                                <span class="fw-semibold">#{{ analysis.id }}</span>
+                                <span class="fw-semibold text-dark">#{{ analysis.id }}</span>
                             </div>
                         </div>
                     </div>
@@ -540,7 +582,7 @@
                                         <tr>
                                             <td class="fw-semibold text-muted">{{ prop }}</td>
                                             {% for d, v in depths.items %}
-                                            <td class="text-center fw-bold">{{ v }}</td>
+                                            <td class="text-center fw-bold text-dark">{{ v }}</td>
                                             {% endfor %}
                                         </tr>
                                         {% endfor %}
@@ -573,7 +615,7 @@
                                 {% for crop in crop_recommendations %}
                                 <div class="crop-item">
                                     <i class="fas fa-seedling text-success me-2"></i>
-                                    <span class="fw-semibold flex-grow-1">{{ crop }}</span>
+                                    <span class="fw-semibold flex-grow-1 text-dark">{{ crop }}</span>
                                     <span class="badge bg-light text-dark ms-2">✓</span>
                                 </div>
                                 {% endfor %}
@@ -608,7 +650,7 @@
                                 <div class="icon-circle icon-warning me-2" style="width: 35px; height: 35px;">
                                     <i class="fas fa-sun"></i>
                                 </div>
-                                <span class="fw-semibold">Solar PV Energy</span>
+                                <span class="fw-semibold text-dark">Solar PV Energy</span>
                             </div>
                             <h4 class="fw-bold text-dark mb-1">{{ energy_results.pv_energy_kwh|floatformat:0 }} kWh</h4>
                             <small class="text-muted">
@@ -627,7 +669,7 @@
                                 <div class="icon-circle icon-info me-2" style="width: 35px; height: 35px;">
                                     <i class="fas fa-wind"></i>
                                 </div>
-                                <span class="fw-semibold">Wind Energy</span>
+                                <span class="fw-semibold text-dark">Wind Energy</span>
                             </div>
                             <h4 class="fw-bold text-dark mb-1">{{ energy_results.wind_energy_kwh|floatformat:0 }} kWh</h4>
                             <small class="text-muted">
@@ -683,9 +725,9 @@
                                 <tbody>
                                     {% for month in energy_results.monthly_breakdown %}
                                     <tr>
-                                        <td class="fw-semibold">{{ month.month }}</td>
-                                        <td class="text-end">{{ month.energy|floatformat:0 }}</td>
-                                        <td class="text-end fw-bold text-success">₹{{ month.revenue|floatformat:0 }}</td>
+                                        <td class="fw-semibold text-dark">{{ month.month }}</td>
+                                        <td class="text-end text-dark">{{ month.pv_energy_kwh|add:month.wind_energy_kwh|floatformat:0 }}</td>
+                                        <td class="text-end fw-bold text-success">₹{{ month.revenue_inr|floatformat:0 }}</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
@@ -756,9 +798,9 @@
                                     <tbody>
                                         {% for scenario in energy_results.mixed_analysis.scenarios %}
                                         <tr {% if energy_results.mixed_analysis.best_scenario and scenario.name == energy_results.mixed_analysis.best_scenario.name %}class="table-success"{% endif %}>
-                                            <td class="fw-semibold">{{ scenario.name }}</td>
+                                            <td class="fw-semibold text-dark">{{ scenario.name }}</td>
                                             <td class="small text-muted">{{ scenario.details }}</td>
-                                            <td class="text-end fw-bold">₹{{ scenario.revenue|floatformat:0 }}</td>
+                                            <td class="text-end fw-bold text-dark">₹{{ scenario.revenue|floatformat:0 }}</td>
                                         </tr>
                                         {% endfor %}
                                     </tbody>
@@ -775,7 +817,7 @@
     <!-- ================= ACTION SECTION ================= -->
     <div class="row mt-4 slide-up" style="animation-delay: 0.8s">
         <div class="col-12">
-            <div class="glass-container text-center py-4 leaf-pattern">
+            <div class="glass-container text-center py-4">
                 <h5 class="fw-semibold mb-3 text-dark">Ready to explore more opportunities?</h5>
                 <div class="d-flex justify-content-center flex-wrap gap-2">
                     <a href="{% url 'analyze' %}" class="btn btn-primary-glass">
@@ -790,21 +832,34 @@
 
 <!-- Chart.js for Revenue Chart -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
+
     {% if energy_results.monthly_breakdown %}
-    // Prepare monthly data
+    // Prepare monthly data (MATCHES BACKEND STRUCTURE)
     const monthlyData = [
         {% for month in energy_results.monthly_breakdown %}
-        { month: "{{ month.month }}", revenue: {{ month.revenue }}, energy: {{ month.energy }} },
+        {
+            month: "{{ month.month }}",
+            revenue: {{ month.revenue_inr|default:0 }},
+            energy: {{ month.pv_energy_kwh|default:0 }} + {{ month.wind_energy_kwh|default:0 }}
+        },
         {% endfor %}
     ];
-    
+
     const months = monthlyData.map(d => d.month);
     const revenues = monthlyData.map(d => d.revenue);
-    
-    // Create chart
-    const ctx = document.getElementById('revenueChart').getContext('2d');
+
+    // Ensure canvas exists
+    const canvas = document.getElementById('revenueChart');
+    if (!canvas) {
+        console.warn("Revenue chart canvas not found");
+        return;
+    }
+
+    const ctx = canvas.getContext('2d');
+
     new Chart(ctx, {
         type: 'bar',
         data: {
@@ -812,10 +867,10 @@ document.addEventListener('DOMContentLoaded', function() {
             datasets: [{
                 label: 'Monthly Revenue (₹)',
                 data: revenues,
-                backgroundColor: 'rgba(39, 174, 96, 0.6)',
-                borderColor: 'rgba(39, 174, 96, 1)',
+                backgroundColor: 'rgba(34, 197, 94, 0.7)',   // green-500
+                borderColor: 'rgba(21, 128, 61, 1)',        // green-700
                 borderWidth: 1,
-                borderRadius: 5
+                borderRadius: 6
             }]
         },
         options: {
@@ -824,18 +879,22 @@ document.addEventListener('DOMContentLoaded', function() {
             scales: {
                 y: {
                     beginAtZero: true,
-                    grid: {
-                        color: 'rgba(0, 0, 0, 0.05)'
-                    },
                     ticks: {
-                        callback: function(value) {
+                        callback: function (value) {
                             return '₹' + value.toLocaleString();
-                        }
+                        },
+                        color: '#4a6358'
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.08)'
                     }
                 },
                 x: {
                     grid: {
                         display: false
+                    },
+                    ticks: {
+                        color: '#4a6358'
                     }
                 }
             },
@@ -845,7 +904,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 tooltip: {
                     callbacks: {
-                        label: function(context) {
+                        label: function (context) {
                             return 'Revenue: ₹' + context.parsed.y.toLocaleString();
                         }
                     }
@@ -879,8 +938,8 @@ document.addEventListener('DOMContentLoaded', function() {
 {% else %}
 <div class="text-center text-muted py-5">
     <i class="fas fa-exclamation-circle fa-3x mb-3"></i>
-    <h4>No analysis data available</h4>
-    <p class="mb-4">Please run a new analysis to view results</p>
+    <h4 class="text-dark">No analysis data available</h4>
+    <p class="mb-4 text-dark">Please run a new analysis to view results</p>
     <a href="{% url 'analyze' %}" class="btn btn-primary-glass">
         <i class="fas fa-play-circle me-2"></i>Start New Analysis
     </a>
